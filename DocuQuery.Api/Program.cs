@@ -1,41 +1,68 @@
+using Azure;
+using Azure.AI.OpenAI;
+using Azure.Search.Documents.Indexes;
+using Azure.Storage.Blobs;
+using DocuQuery.Api.Services;
+using Microsoft.Extensions.AI;
+using Microsoft.SemanticKernel.Connectors.AzureAISearch;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Azure OpenAI client
+var openAiClient = new AzureOpenAIClient(
+    new Uri(builder.Configuration["AzureOpenAI:Endpoint"]!),
+    new AzureKeyCredential(builder.Configuration["AzureOpenAI:ApiKey"]!));
+
+// IChatClient
+builder.Services.AddSingleton<IChatClient>(
+    new AzureOpenAIClient(
+        new Uri(builder.Configuration["AzureOpenAI:Endpoint"]!),
+        new AzureKeyCredential(builder.Configuration["AzureOpenAI:ApiKey"]!))
+    .GetChatClient(builder.Configuration["AzureOpenAI:ChatDeployment"]!)
+    .AsIChatClient());
+
+// Embedding generator
+builder.Services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>>(
+    new AzureOpenAIClient(
+        new Uri(builder.Configuration["AzureOpenAI:Endpoint"]!),
+        new AzureKeyCredential(builder.Configuration["AzureOpenAI:ApiKey"]!))
+    .GetEmbeddingClient(builder.Configuration["AzureOpenAI:EmbeddingDeployment"]!)
+    .AsIEmbeddingGenerator());
+
+// Azure AI Search vector store
+builder.Services.AddSingleton(new AzureAISearchVectorStore(
+    new SearchIndexClient(
+        new Uri(builder.Configuration["AzureAISearch:Endpoint"]!),
+        new AzureKeyCredential(builder.Configuration["AzureAISearch:ApiKey"]!))));
+
+// Azure Blob Storage
+builder.Services.AddSingleton(
+    new BlobServiceClient(builder.Configuration["AzureStorage:ConnectionString"]!));
+
+// App services
+builder.Services.AddScoped<IngestService>();
+builder.Services.AddScoped<RagAgentService>();
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+    options.AddPolicy("Angular", policy =>
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader()));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
+app.UseCors("Angular");
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
