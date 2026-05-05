@@ -9,6 +9,7 @@ AI-powered document Q&A — upload a PDF, ask questions, get answers with citati
 DocuQuery lets you upload any PDF document and ask natural language questions about it. The app finds the most relevant passages using vector similarity search and uses GPT-4o to generate accurate answers with source citations.
 
 ## Architecture
+<img width="1440" height="720" alt="image" src="https://github.com/user-attachments/assets/049a6ac5-fad1-4377-a7cc-d4f9f4f10b2a" />
 
 Angular 21 → ASP.NET Core 10 API → Azure OpenAI (GPT-4o + text-embedding-3-large)
                                  → Azure AI Search (vector store)
