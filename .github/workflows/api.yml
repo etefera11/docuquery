@@ -19,15 +19,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Build and Publish
-        run: dotnet publish DocuQuery.Api/DocuQuery.Api.csproj --configuration Release --output ./publish
-
-      - name: Zip publish output
-        run: cd publish && zip -r ../deploy.zip .
+      - name: Publish
+        run: dotnet publish DocuQuery.Api/DocuQuery.Api.csproj -c Release -o ./publish
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'docuquery-api'
           publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
-          package: ./deploy.zip
+          package: ./publish

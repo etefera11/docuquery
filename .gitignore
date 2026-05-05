@@ -64,3 +64,8 @@ node_modules/
 dist/
 .angular/
 .vscode/
+
+publish/
+publish-linux/
+linux-output/
+*.zip
