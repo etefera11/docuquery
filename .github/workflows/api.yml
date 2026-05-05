@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'DocuQuery.Api/**'
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -18,15 +19,15 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Build
-        run: dotnet build DocuQuery.Api/DocuQuery.Api.csproj --configuration Release
-
-      - name: Publish
+      - name: Build and Publish
         run: dotnet publish DocuQuery.Api/DocuQuery.Api.csproj --configuration Release --output ./publish
+
+      - name: Zip publish output
+        run: cd publish && zip -r ../deploy.zip .
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'docuquery-api'
           publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
-          package: ./publish
+          package: ./deploy.zip
