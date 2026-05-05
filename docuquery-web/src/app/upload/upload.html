@@ -1,28 +1,32 @@
-<div class="upload-container">
-  <h2>Upload Document</h2>
+<mat-card class="upload-card">
+  <mat-card-header>
+    <mat-card-title>Upload Document</mat-card-title>
+    <mat-card-subtitle>PDF files only, max 20MB</mat-card-subtitle>
+  </mat-card-header>
 
-  <input
-    type="file"
-    accept=".pdf"
-    (change)="onFileSelected($event)"
-    #fileInput
-    hidden />
+  <mat-card-content>
+    <input type="file" accept=".pdf" (change)="onFileSelected($event)" #fileInput hidden />
 
-  <button (click)="fileInput.click()" [disabled]="uploading">
-    {{ selectedFile ? selectedFile.name : 'Choose PDF' }}
-  </button>
+    <div class="upload-actions">
+      <button mat-stroked-button (click)="fileInput.click()" [disabled]="uploading">
+        <mat-icon>attach_file</mat-icon>
+        {{ selectedFile ? selectedFile.name : 'Choose PDF' }}
+      </button>
 
-  <button
-    (click)="upload()"
-    [disabled]="!selectedFile || uploading">
-    {{ uploading ? 'Uploading...' : 'Upload' }}
-  </button>
+      <button mat-raised-button color="primary"
+        (click)="upload()"
+        [disabled]="!selectedFile || uploading">
+        <mat-icon>cloud_upload</mat-icon>
+        {{ uploading ? 'Uploading...' : 'Upload' }}
+      </button>
+    </div>
 
-  <div *ngIf="result">
-    ✅ {{ result.fileName }} — {{ result.chunksCreated }} chunks created
-  </div>
+    <mat-progress-bar *ngIf="uploading" mode="indeterminate" />
 
-  <div *ngIf="error">
-    ❌ {{ error }}
-  </div>
-</div>
+    <p *ngIf="result" class="success">
+      ✅ {{ result.fileName }} — {{ result.chunksCreated }} chunks indexed
+    </p>
+
+    <p *ngIf="error" class="error">❌ {{ error }}</p>
+  </mat-card-content>
+</mat-card>

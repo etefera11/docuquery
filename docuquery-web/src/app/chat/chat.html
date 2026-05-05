@@ -1,31 +1,47 @@
-<div class="chat-container">
-  <div class="messages">
-    <div *ngFor="let message of messages"
-         [class]="'message ' + message.role">
-      <span class="role">{{ message.role === 'user' ? 'You' : 'DocuQuery' }}</span>
-      <p>{{ message.content }}</p>
+<mat-card class="chat-card">
+  <mat-card-header>
+    <mat-card-title>Ask a Question</mat-card-title>
+    <mat-card-subtitle>Questions are answered using your uploaded document</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="messages" #messageContainer>
+      <div *ngFor="let message of messages" [class]="'message ' + message.role">
+        <span class="role-label">{{ message.role === 'user' ? 'You' : 'DocuQuery' }}</span>
+        <p>{{ message.content }}</p>
+      </div>
+
+      <div *ngIf="asking" class="message assistant thinking">
+        <span class="role-label">DocuQuery</span>
+        <mat-spinner diameter="20" />
+      </div>
     </div>
 
-    <div *ngIf="asking" class="message assistant thinking">
-      <span class="role">DocuQuery</span>
-      <p>Thinking...</p>
+    <p *ngIf="error" class="error">❌ {{ error }}</p>
+  </mat-card-content>
+
+  <mat-card-actions class="input-area">
+    <mat-form-field appearance="outline" class="question-field">
+      <mat-label>Ask a question about your document</mat-label>
+      <textarea matInput
+        [(ngModel)]="question"
+        (keydown)="onKeyDown($event)"
+        [disabled]="asking"
+        rows="2">
+      </textarea>
+    </mat-form-field>
+
+    <div class="action-buttons">
+      <button mat-raised-button color="primary"
+        (click)="ask()"
+        [disabled]="!question.trim() || asking">
+        <mat-icon>send</mat-icon>
+        Ask
+      </button>
+      <button mat-stroked-button (click)="clearChat()">
+        <mat-icon>clear</mat-icon>
+        Clear
+      </button>
     </div>
-  </div>
-
-  <div *ngIf="error" class="error">❌ {{ error }}</div>
-
-  <div class="input-row">
-    <textarea
-      [(ngModel)]="question"
-      (keydown)="onKeyDown($event)"
-      placeholder="Ask a question about your document..."
-      rows="2"
-      [disabled]="asking">
-    </textarea>
-    <button (click)="ask()" [disabled]="!question.trim() || asking">
-      {{ asking ? '...' : 'Ask' }}
-    </button>
-  </div>
-
-  <button class="clear" (click)="clearChat()">Clear chat</button>
-</div>
+  </mat-card-actions>
+</mat-card>

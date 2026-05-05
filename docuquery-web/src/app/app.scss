@@ -1,0 +1,19 @@
+.app-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+header {
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 300;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #666;
+  }
+}

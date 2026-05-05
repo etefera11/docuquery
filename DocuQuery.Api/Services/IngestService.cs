@@ -30,26 +30,37 @@ namespace DocuQuery.Api.Services
             var collection = vectorStore.GetCollection<string, DocumentChunk>("documents");
             await collection.EnsureCollectionExistsAsync(ct);
 
-            // 3. Extract text with PdfPig, embed, and upsert
+            // 3. Extract all chunks first
+            var chunks = new List<DocumentChunk>();
             using var pdf = PdfDocument.Open(file.OpenReadStream());
             foreach (var page in pdf.GetPages())
             {
                 var content = string.Join(" ", page.GetWords().Select(w => w.Text));
                 if (string.IsNullOrWhiteSpace(content)) continue;
 
-                var embeddings = await embeddingGenerator.GenerateAsync(new[] { content }, cancellationToken: ct);
-                var embedding = embeddings[0].Vector;
-
-                var chunk = new DocumentChunk
+                chunks.Add(new DocumentChunk
                 {
                     FileName = file.FileName,
                     PageNumber = page.Number,
-                    Content = content,
-                    Embedding = embedding
-                };
+                    Content = content
+                });
+            }
 
-                await collection.UpsertAsync(chunk, ct);
-                chunksCreated++;
+            // 4. Embed in batches of 20
+            const int batchSize = 20;
+            for (int i = 0; i < chunks.Count; i += batchSize)
+            {
+                var batch = chunks.Skip(i).Take(batchSize).ToList();
+                var texts = batch.Select(c => c.Content).ToList();
+
+                var embeddings = await embeddingGenerator.GenerateAsync(texts, cancellationToken: ct);
+
+                for (int j = 0; j < batch.Count; j++)
+                    batch[j].Embedding = embeddings[j].Vector;
+
+                var upsertTasks = batch.Select(async chunk => await collection.UpsertAsync(chunk, ct));
+                await Task.WhenAll(upsertTasks);
+                chunksCreated += batch.Count;
             }
 
             logger.LogInformation("Ingested {FileName} with {ChunksCreated} chunks", file.FileName, chunksCreated);
