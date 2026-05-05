@@ -49,7 +49,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
     options.AddPolicy("Angular", policy =>
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(
+            "http://localhost:4200",
+            "https://happy-bay-077ce800f7.azurestaticapps.net",
+            "https://docuquery.ezana.dev")
               .AllowAnyMethod()
               .AllowAnyHeader()));
 
