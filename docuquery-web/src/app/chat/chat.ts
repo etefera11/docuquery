@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DocuQueryService, ChatTurn, ChatResponse } from '../services/docu-query';
+import { DocuQueryService, ChatTurn, ChatResult } from '../services/docu-query';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -36,7 +36,7 @@ export class ChatComponent {
     this.messages.push({ role: 'user', content: userQuestion });
 
     this.docuQuery.askQuestion(userQuestion, this.history).subscribe({
-      next: (response: ChatResponse) => {
+      next: (response: ChatResult) => {
         this.messages.push({ role: 'assistant', content: response.answer });
         this.history.push({ role: 'user', content: userQuestion });
         this.history.push({ role: 'assistant', content: response.answer });
