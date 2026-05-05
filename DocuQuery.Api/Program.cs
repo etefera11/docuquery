@@ -69,7 +69,6 @@ app.UseSwaggerUI();
 
 app.UseForwardedHeaders();
 app.UseCors("Angular");
-app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
