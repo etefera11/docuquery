@@ -6,7 +6,7 @@
 
     public record ChatTurn(string Role, string Content);
 
-    public record ChatResponse(string Answer, List<Citation> Citations);
+    public record ChatResult(string Answer, List<Citation> Citations);
 
     public record Citation(string FileName, int PageNumber, string Excerpt);
 }

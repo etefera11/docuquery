@@ -2,7 +2,7 @@ using DocuQuery.Api.Models;
 using DocuQuery.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
-using ChatResponseDto = DocuQuery.Api.Models.ChatResponse;
+using ChatResponseDto = DocuQuery.Api.Models.ChatResult;
 
 namespace DocuQuery.Api.Controllers
 {

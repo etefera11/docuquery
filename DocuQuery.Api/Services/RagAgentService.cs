@@ -6,7 +6,7 @@ using Microsoft.SemanticKernel.Connectors.AzureAISearch;
 using System.ComponentModel;
 using System.Text.Json;
 
-using ChatResponseDto = DocuQuery.Api.Models.ChatResponse;
+using ChatResponseDto = DocuQuery.Api.Models.ChatResult;
 
 namespace DocuQuery.Api.Services
 {

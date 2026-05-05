@@ -18,7 +18,7 @@ export interface ChatTurn {
   content: string;
 }
 
-export interface ChatResponse {
+export interface ChatResult {
   answer: string;
   citations: Citation[];
 }
@@ -43,8 +43,8 @@ export class DocuQueryService {
     return this.http.post<IngestResponse>(`${this.apiUrl}/api/documents/upload`, formData);
   }
 
-  askQuestion(question: string, history: ChatTurn[] = []): Observable<ChatResponse> {
+  askQuestion(question: string, history: ChatTurn[] = []): Observable<ChatResult> {
     const request: ChatRequest = { question, history };
-    return this.http.post<ChatResponse>(`${this.apiUrl}/api/chat/ask`, request);
+    return this.http.post<ChatResult>(`${this.apiUrl}/api/chat/ask`, request);
   }
 }
