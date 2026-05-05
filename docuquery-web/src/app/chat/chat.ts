@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-chat',
@@ -23,7 +24,7 @@ export class ChatComponent {
   messages: { role: string; content: string }[] = [];
   error: string | null = null;
 
-  constructor(private docuQuery: DocuQueryService) {}
+  constructor(private docuQuery: DocuQueryService, private cdr: ChangeDetectorRef) { }
 
   ask() {
     if (!this.question.trim() || this.asking) return;
@@ -41,11 +42,13 @@ export class ChatComponent {
         this.history.push({ role: 'user', content: userQuestion });
         this.history.push({ role: 'assistant', content: response.answer });
         this.asking = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Failed to get answer. Please try again.';
         this.asking = false;
         console.error(err);
+        this.cdr.detectChanges();
       }
     });
   }

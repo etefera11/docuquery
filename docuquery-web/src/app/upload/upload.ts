@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCardModule } from '@angular/material/card';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-upload',
@@ -19,7 +20,7 @@ export class UploadComponent {
   result: IngestResponse | null = null;
   error: string | null = null;
 
-  constructor(private docuQuery: DocuQueryService) {}
+  constructor(private docuQuery: DocuQueryService, private cdr: ChangeDetectorRef) {}
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -40,10 +41,12 @@ export class UploadComponent {
       next: (response) => {
         this.result = response;
         this.uploading = false;
+          this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Upload failed. Please try again.';
         this.uploading = false;
+          this.cdr.detectChanges();
         console.error(err);
       }
     });
