@@ -1,0 +1,28 @@
+<div class="upload-container">
+  <h2>Upload Document</h2>
+
+  <input
+    type="file"
+    accept=".pdf"
+    (change)="onFileSelected($event)"
+    #fileInput
+    hidden />
+
+  <button (click)="fileInput.click()" [disabled]="uploading">
+    {{ selectedFile ? selectedFile.name : 'Choose PDF' }}
+  </button>
+
+  <button
+    (click)="upload()"
+    [disabled]="!selectedFile || uploading">
+    {{ uploading ? 'Uploading...' : 'Upload' }}
+  </button>
+
+  <div *ngIf="result">
+    ✅ {{ result.fileName }} — {{ result.chunksCreated }} chunks created
+  </div>
+
+  <div *ngIf="error">
+    ❌ {{ error }}
+  </div>
+</div>

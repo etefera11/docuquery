@@ -59,3 +59,8 @@ nunit-*.xml
 .vs/
 *.suo
 *.user
+
+node_modules/
+dist/
+.angular/
+.vscode/
