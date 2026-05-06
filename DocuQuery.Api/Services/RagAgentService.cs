@@ -6,8 +6,6 @@ using Microsoft.SemanticKernel.Connectors.AzureAISearch;
 using System.ComponentModel;
 using System.Text.Json;
 
-using ChatResponseDto = DocuQuery.Api.Models.ChatResult;
-
 namespace DocuQuery.Api.Services
 {
     public class RagAgentService(
@@ -16,7 +14,7 @@ namespace DocuQuery.Api.Services
         AzureAISearchVectorStore vectorStore,
         ILogger<RagAgentService> logger)
     {
-        public async Task<ChatResponseDto> AskAsync(ChatRequest request, CancellationToken ct = default)
+        public async Task<ChatResult> AskAsync(ChatRequest request, CancellationToken ct = default)
         {
             var searchTool = AIFunctionFactory.Create(
                 async ([Description("The user's question")] string question) =>
@@ -25,10 +23,15 @@ namespace DocuQuery.Api.Services
                         [question], cancellationToken: ct);
                     var vector = embeddings[0].Vector;
 
-                    VectorStoreCollection<string, DocumentChunk> collection =
-                        vectorStore.GetCollection<string, DocumentChunk>("documents");
-
-                    var searchResults = collection.SearchAsync(vector, top: 5, cancellationToken: ct);
+                    var collection = vectorStore.GetCollection<string, DocumentChunk>("documents");
+                    var searchResults = collection.SearchAsync(
+                       vector,
+                       top: 5,
+                       options: new VectorSearchOptions<DocumentChunk>
+                       {
+                           Filter = r => r.SessionId == request.SessionId
+                       },
+                       cancellationToken: ct);
 
                     var chunks = new List<object>();
                     await foreach (var result in searchResults)
@@ -61,7 +64,7 @@ namespace DocuQuery.Api.Services
                 cancellationToken: ct);
 
             logger.LogInformation("Agent answered: {Question}", request.Question);
-            return new ChatResponseDto(response.Text ?? string.Empty, []);
+            return new ChatResult(response.Text ?? string.Empty, []);
         }
     }
 }

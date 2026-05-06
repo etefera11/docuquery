@@ -2,7 +2,7 @@
 {
     public record IngestResponse(string FileName, int ChunksCreated);
 
-    public record ChatRequest(string Question, List<ChatTurn>? History = null);
+    public record ChatRequest(string Question, string SessionId, List<ChatTurn>? History = null);
 
     public record ChatTurn(string Role, string Content);
 

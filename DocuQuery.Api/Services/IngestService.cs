@@ -13,7 +13,7 @@ namespace DocuQuery.Api.Services
         AzureAISearchVectorStore vectorStore,
         ILogger<IngestService> logger)
     {
-        public async Task<IngestResponse> IngestAsync(IFormFile file, CancellationToken ct = default)
+        public async Task<IngestResponse> IngestAsync(IFormFile file, string sessionId, CancellationToken ct = default)
         {
             var chunksCreated = 0;
 
@@ -42,7 +42,8 @@ namespace DocuQuery.Api.Services
                 {
                     FileName = file.FileName,
                     PageNumber = page.Number,
-                    Content = content
+                    Content = content,
+                    SessionId = sessionId
                 });
             }
 

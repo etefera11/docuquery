@@ -10,6 +10,7 @@ export interface IngestResponse {
 
 export interface ChatRequest {
   question: string;
+  sessionId: string;
   history: ChatTurn[];
 }
 
@@ -34,17 +35,19 @@ export interface Citation {
 })
 export class DocuQueryService {
   private apiUrl = environment.apiUrl;
+  readonly sessionId = crypto.randomUUID();
 
   constructor(private http: HttpClient) {}
 
   uploadDocument(file: File): Observable<IngestResponse> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('sessionId', this.sessionId);
     return this.http.post<IngestResponse>(`${this.apiUrl}/api/documents/upload`, formData);
   }
 
   askQuestion(question: string, history: ChatTurn[] = []): Observable<ChatResult> {
-    const request: ChatRequest = { question, history };
+    const request: ChatRequest = { question, sessionId: this.sessionId, history };
     return this.http.post<ChatResult>(`${this.apiUrl}/api/chat/ask`, request);
   }
 }
