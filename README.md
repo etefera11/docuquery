@@ -60,7 +60,3 @@ cd docuquery-web
 npm install
 ng serve
 ```
-
-## Author
-
-**Ezana Tefera** — [ezana.dev](https://ezana.dev) · [LinkedIn](https://linkedin.com/in/ezanatefera)
